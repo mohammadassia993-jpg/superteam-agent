@@ -1,14 +1,9 @@
-name: Register Superteam Agent
-
-on:
-  workflow_dispatch:
-
+name: Get API Key
+on: workflow_dispatch
 jobs:
-  register:
+  get-key:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Register Agent with Superteam
-        run: curl -s -X POST https://superteam.fun/api/agents -H "Content-Type: application/json" -d '{"name":"PriceHunterAgent"}'
+      - run: |
+          RESPONSE=$(curl -s -X POST https://superteam.fun/api/agents -H "Content-Type: application/json" -d '{"name":"MyAgent"}')
+          echo "$RESPONSE"
