@@ -4,7 +4,7 @@ from datetime import datetime
 
 API_KEY = os.environ.get("SUPERTEAM_API_KEY")
 WALLET = os.environ.get("PHANTOM_WALLET")
-TELEGRAM = "@Mohammadabbas891"  # تم إضافة اسم المستخدم الخاص بك
+TELEGRAM = "@Mohammadabbas891"
 
 def search_tasks():
     url = "https://superteam.fun/api/agents/listings/live"
@@ -33,48 +33,44 @@ def submit_to_task(task_id, title, link="https://github.com/superteam-agent"):
     payload = {
         "listingId": task_id,
         "link": link,
-        "otherInfo": f"تم إنجاز هذه المهمة بواسطة وكيل آلي. العمل: {title}",
+        "otherInfo": f"Task completed by automated agent. Project: {title}",
         "telegram": TELEGRAM
     }
     try:
         response = requests.post(url, headers=headers, json=payload)
-        if response.status_code == 200:
-            print(f"  ✅ تم التقديم على المهمة: {title}")
+        # حتى لو كان الرد خطأ، نطبع محتواه للتحقق
+        print(f"  Submission response status: {response.status_code}")
+        if response.status_code == 200 or response.status_code == 201:
+            print(f"  ✅ Successfully applied for: {title}")
             return True
         else:
-            print(f"  ❌ فشل التقديم على {title}: {response.status_code}")
+            print(f"  ❌ Failed to apply for {title}: {response.text}")
             return False
     except Exception as e:
-        print(f"  ⚠️ خطأ في التقديم: {e}")
+        print(f"  ⚠️ Submission error: {e}")
         return False
 
 def auto_submit(tasks):
-    """يتقدم تلقائياً على أول 3 مهام مناسبة"""
     if not tasks:
-        print("لا توجد مهام للتقديم.")
+        print("No tasks to apply for.")
         return
     count = 0
-    for task in tasks[:3]:  # قدم على أول 3 مهام
+    for task in tasks[:3]:
         task_id = task.get('id')
-        title = task.get('title', 'بدون عنوان')
+        title = task.get('title', 'Untitled')
         if task_id:
-            print(f"📝 جاري التقديم على: {title}")
-            submit_to_task(task_id, title)
-            count += 1
-    print(f"✅ تم التقديم على {count} مهمة.")
+            print(f"📝 Applying for: {title}")
+            if submit_to_task(task_id, title):
+                count += 1
+    print(f"✅ Applied for {count} tasks.")
 
 if __name__ == "__main__":
     print("🚀 Superteam Agent starting...")
     print(f"💰 Wallet: {WALLET}")
     print(f"📱 Telegram: {TELEGRAM}")
-    
-    # البحث عن المهام
     tasks = search_tasks()
-    
-    # التقديم التلقائي على المهام
     if tasks:
         auto_submit(tasks)
     else:
-        print("⚠️ لم يتم العثور على مهام للتقديم.")
-    
+        print("⚠️ No tasks found.")
     print("✅ Done.")
