@@ -1,0 +1,9 @@
+name: Register Superteam Agent
+on:
+  workflow_dispatch:
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Register Agent
+        run: curl -s -X POST https://superteam.fun/api/agents -H "Content-Type: application/json" -d '{"name":"PriceHunterAgent"}'
